@@ -1,0 +1,7 @@
+DATA/
+logs/
+*.csv
+*.log
+__pycache__/
+.ipynb_checkpoints/
+application_react/node_modules/
