@@ -1,81 +1,14 @@
-GET movies_raw/_count
-GET movies_clean/_count
+# Requêtes Elasticsearch — Movies Data Platform
+> Index cible : `movies_clean`
+> 12 requêtes commentées dont 5 requêtes bool
 
+---
 
-DELETE movies_raw
-DELETE movies_clean 
+## Requête 1 — Tous les films en anglais (term exact)
+> **Cas métier** : lister les films en version originale anglaise.
+> `term` sur un champ `keyword` pour correspondance exacte.
 
-
-GET movies_clean/_mapping
-
-GET movies_clean/_analyze
-{
-  "analyzer": "movie_analyzer",
-  "text": "The Dark Knight Rises"
-}
-
-
-PUT movies_clean
-{
-  "settings": {
-    "analysis": {
-      "analyzer": {
-        "movie_analyzer": {
-          "type": "custom",
-          "tokenizer": "standard",
-          "filter": ["lowercase", "asciifolding", "movie_stop"]
-        }
-      },
-      "filter": {
-        "movie_stop": {
-          "type": "stop",
-          "stopwords": "_english_"
-        }
-      }
-    }
-  },
-  "mappings": {
-    "properties": {
-      "id":                { "type": "integer" },
-      "title":             { "type": "text", "analyzer": "movie_analyzer", "fields": { "keyword": { "type": "keyword" } } },
-      "genres":            { "type": "text", "analyzer": "movie_analyzer", "fields": { "keyword": { "type": "keyword" } } },
-      "original_language": { "type": "keyword" },
-      "overview":          { "type": "text", "analyzer": "movie_analyzer" },
-      "popularity":        { "type": "float" },
-      "release_date":      { "type": "keyword" },
-      "release_date_ts":   { "type": "date" },
-      "budget":            { "type": "float" },
-      "revenue":           { "type": "float" },
-      "runtime":           { "type": "float" },
-      "status":            { "type": "keyword" },
-      "tagline":           { "type": "text", "analyzer": "movie_analyzer" },
-      "vote_average":      { "type": "float" },
-      "vote_count":        { "type": "float" },
-      "rating_band":       { "type": "keyword" }
-    }
-  }
-}
-GET movies_raw/_search
-{
-  "size": 1,
-  "_source": ["id", "title", "vote_average", "status", "original_language"]
-}
-
-GET movies_clean/_search
-{
-  "size": 1,
-  "_source": ["id", "title", "vote_average", "status", "original_language", "rating_band"]
-}
-
-
-
-GET movies_clean/_count
-GET movies_clean/_mapping
-
-
-# Les Requetes 
-#  Tous les films en anglais 
-
+```json
 GET movies_clean/_search
 {
   "query": {
@@ -86,9 +19,15 @@ GET movies_clean/_search
   "size": 5,
   "_source": ["title", "original_language", "vote_average"]
 }
+```
 
+---
 
-# Films avec note > 8
+## Requête 2 — Films avec note supérieure à 8 (range)
+> **Cas métier** : identifier les films très bien notés.
+> `range` sur un champ numérique `float`.
+
+```json
 GET movies_clean/_search
 {
   "query": {
@@ -101,8 +40,15 @@ GET movies_clean/_search
   "size": 5,
   "_source": ["title", "vote_average", "rating_band"]
 }
+```
 
-# le nombre total de films en anglais 
+---
+
+## Requête 3 — Nombre total de films en anglais (count)
+> **Cas métier** : mesure de volumétrie par langue.
+> `size: 0` + `track_total_hits` pour compter sans retourner de documents.
+
+```json
 GET movies_clean/_search
 {
   "track_total_hits": true,
@@ -113,8 +59,15 @@ GET movies_clean/_search
   },
   "size": 0
 }
+```
 
-#films sortis apres 2010
+---
+
+## Requête 4 — Films sortis après 2010 (range sur date)
+> **Cas métier** : analyser la production cinématographique récente.
+> `range` sur le champ `release_date` de type keyword.
+
+```json
 GET movies_clean/_search
 {
   "track_total_hits": true,
@@ -128,8 +81,15 @@ GET movies_clean/_search
   },
   "_source": ["title", "release_date", "vote_average"]
 }
+```
 
-# requete bool  Films d'action avec note > 7
+---
+
+## Requête 5 — BOOL : Films d'action avec note > 7 (must + filter)
+> **Cas métier** : trouver les meilleurs films d'action.
+> CORRECTION : `genres_str` au lieu de `genres` (champ supprimé après nettoyage).
+
+```json
 GET movies_clean/_search
 {
   "track_total_hits": true,
@@ -139,7 +99,7 @@ GET movies_clean/_search
       "must": [
         {
           "match": {
-            "genres": "action"
+            "genres_str": "Action"
           }
         }
       ],
@@ -154,10 +114,165 @@ GET movies_clean/_search
       ]
     }
   },
-  "_source": ["title", "genres", "vote_average"]
+  "_source": ["title", "genres_list", "vote_average"]
 }
+```
 
-# requete agregation  Moyenne des notes par langue
+---
+
+## Requête 6 — BOOL : Films rentables en anglais après 2000 (must + filter multiples)
+> **Cas métier** : identifier les films anglophones rentables de l'ère moderne.
+> Combinaison de `term`, `range` dans les `filter`.
+
+```json
+GET movies_clean/_search
+{
+  "track_total_hits": true,
+  "size": 5,
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "term": {
+            "is_profitable": true
+          }
+        }
+      ],
+      "filter": [
+        {
+          "term": {
+            "original_language": "en"
+          }
+        },
+        {
+          "range": {
+            "release_date": {
+              "gte": "2000-01-01"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "_source": ["title", "budget", "revenue", "profit", "roi", "release_year"]
+}
+```
+
+---
+
+## Requête 7 — BOOL : Films excellents NON en anglais (must + must_not)
+> **Cas métier** : découvrir les chefs-d'œuvre du cinéma international.
+> `must_not` pour exclure une valeur exacte de langue.
+
+```json
+GET movies_clean/_search
+{
+  "track_total_hits": true,
+  "size": 5,
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "term": {
+            "rating_band": "excellent"
+          }
+        }
+      ],
+      "must_not": [
+        {
+          "term": {
+            "original_language": "en"
+          }
+        }
+      ]
+    }
+  },
+  "_source": ["title", "original_language", "vote_average", "rating_band"]
+}
+```
+
+---
+
+## Requête 8 — BOOL : Blockbusters sci-fi avec gros budget (should + filter)
+> **Cas métier** : identifier les blockbusters de science-fiction.
+> `should` pour matcher plusieurs genres, `filter` pour budget minimum.
+
+```json
+GET movies_clean/_search
+{
+  "track_total_hits": true,
+  "size": 5,
+  "query": {
+    "bool": {
+      "should": [
+        { "match": { "genres_str": "Science Fiction" } },
+        { "match": { "genres_str": "Sci-Fi" } }
+      ],
+      "filter": [
+        {
+          "range": {
+            "budget": {
+              "gte": 50000000
+            }
+          }
+        }
+      ],
+      "minimum_should_match": 1
+    }
+  },
+  "_source": ["title", "genres_list", "budget", "revenue", "vote_average"]
+}
+```
+
+---
+
+## Requête 9 — BOOL : Films avec keyword "spy" bien notés (must + filter)
+> **Cas métier** : retrouver les films d'espionnage de qualité.
+> `match` sur `keywords_list` combiné à un filtre sur la note.
+
+```json
+GET movies_clean/_search
+{
+  "track_total_hits": true,
+  "size": 5,
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "genres_str": "Drama"
+          }
+        }
+      ],
+      "filter": [
+        {
+          "range": {
+            "vote_average": {
+              "gte": 7.5
+            }
+          }
+        },
+        {
+          "range": {
+            "release_year": {
+              "gte": 1990
+            }
+          }
+        }
+      ]
+    }
+  },
+  "_source": ["title", "genres_list", "vote_average", "release_year"]
+}
+```
+
+---
+
+## Requête 10 — Agrégation : Moyenne des notes par langue
+> **Cas métier** : comparer la qualité perçue des films selon leur langue.
+> `terms` aggregation + `avg` sub-aggregation.
+
+```json
 GET movies_clean/_search
 {
   "size": 0,
@@ -177,3 +292,71 @@ GET movies_clean/_search
     }
   }
 }
+```
+
+---
+
+## Requête 11 — Agrégation : Top 10 genres les plus représentés
+> **Cas métier** : identifier quels genres dominent le catalogue.
+> `terms` aggregation sur le champ `keyword` array `genres_list`.
+
+```json
+GET movies_clean/_search
+{
+  "size": 0,
+  "aggs": {
+    "top_genres": {
+      "terms": {
+        "field": "genres_list",
+        "size": 10
+      },
+      "aggs": {
+        "note_moyenne": {
+          "avg": {
+            "field": "vote_average"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+---
+
+## Requête 12 — Agrégation : Répartition des films par année et rating_band
+> **Cas métier** : évolution de la qualité des films au fil des années.
+> `terms` aggregation imbriquée sur `release_year` et `rating_band`.
+
+```json
+GET movies_clean/_search
+{
+  "size": 0,
+  "query": {
+    "range": {
+      "release_year": {
+        "gte": 2000,
+        "lte": 2023
+      }
+    }
+  },
+  "aggs": {
+    "par_annee": {
+      "terms": {
+        "field": "release_year",
+        "size": 24,
+        "order": { "_key": "asc" }
+      },
+      "aggs": {
+        "par_rating": {
+          "terms": {
+            "field": "rating_band",
+            "size": 4
+          }
+        }
+      }
+    }
+  }
+}
+```
+
