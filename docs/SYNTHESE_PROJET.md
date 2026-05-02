@@ -1,4 +1,4 @@
-# Movies Data Platform — Document Synthèse
+# Movies Data Platform — Document Synthèse ELK
 
 ## Résumé exécutif
 
