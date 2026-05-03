@@ -1,4 +1,4 @@
-# Requêtes Elasticsearch — Movies Data Platform
+# Requêtes Elasticsearch — Movies Data Platform ELK
 > Index cible : `movies_clean`
 > 12 requêtes commentées dont 5 requêtes bool
 

@@ -1,19 +1,16 @@
 GET movies_raw/_count
 GET movies_clean/_count
 
-
-
-
-
+========================
 
 DELETE movies_raw
 DELETE movies_clean 
 
+========================
 
 GET movies_clean/_mapping
 
-
-
+========================
 
 
 PUT movies_clean

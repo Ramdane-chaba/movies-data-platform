@@ -1,4 +1,4 @@
-# Gestion de Projet — Movies Data Platform
+# Gestion de Projet — Movies Data Platform ELK
 
 ## Vue d'ensemble
 

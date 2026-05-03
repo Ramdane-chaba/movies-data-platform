@@ -1,4 +1,4 @@
-# Planning Poker — Movies Data Platform
+# Planning Poker — Movies Data Platform ELK
 
 ## Vue d'ensemble
 
