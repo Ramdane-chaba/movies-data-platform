@@ -1,103 +1,90 @@
-🎬 Movies Data Platform — ELK Stack
+# 🎬 Movies Data Platform
 
-Plateforme d’ingestion, transformation et analyse de données films basée sur Elasticsearch, Logstash et Kibana.
+Plateforme d'analyse de films avec **ELK Stack** (Elasticsearch, Kibana, Logstash)
 
-👥 Équipe : Ramdane CHABA • Ouissem Aouimeur • Ghiles Mekdam
+**Équipe** : Ramdane CHABA • Ouissem Aouimeur • Ghiles Mekdam
 
-✨ Highlights
-⚡ Ingestion automatisée (~1200+ films CSV)
-🧹 Pipeline de nettoyage (16 étapes Logstash)
-🧠 25+ champs typés + analyzer personnalisé
-🔎 12+ requêtes DSL (dont bool & agrégations)
-📊 Dashboard Kibana (6–8 visualisations)
-⚛️ Moteur de recherche React
-🏗️ Architecture
-CSV → Logstash (raw.conf) → movies_raw
-         ↓
-      clean.conf (16 étapes)
-         ↓
-      movies_clean → Elasticsearch
-         ↓
-    ┌────┴────┐
-    ▼         ▼
-  Kibana   React App
-🚀 Quick Start
-git clone https://github.com/votre-repo/movies-data-platform.git
+---
+
+## 📌 Vue d'ensemble
+
+Projet d'ingestion et d'analyse de ~1200 films avec :
+- Nettoyage automatique (16 étapes Logstash)
+- Indexation Elasticsearch (2 index)
+- Visualisations Kibana
+- Moteur de recherche React
+
+---
+
+## 🚀 Démarrage
+
+```bash
+git clone <repo>
 cd movies-data-platform
 
-mkdir -p DATA
-cp path/to/movies.csv DATA/
+# Placer les données
+mkdir -p DATA && cp movies.csv DATA/
 
+# Démarrer
 docker-compose up -d
-Accès
-Kibana → http://localhost:5602
-Elasticsearch → http://localhost:9201
-React → http://localhost:5173
-Vérifier l’ingestion
-curl http://localhost:9201/movies_clean/_count
-📁 Structure
-movies-data-platform/
-├── logstash/pipeline/
-├── application_react/
-├── docs/
-├── DATA/
-└── docker-compose.yml
-⚙️ Fonctionnalités
-🔄 Data Pipeline
-raw.conf : ingestion CSV
-clean.conf : 16 étapes (nettoyage, typage, enrichissement)
-🔎 Search & Analytics
-Mapping optimisé (25+ champs)
-Analyzer movie_analyzer
-Requêtes DSL avancées
-📊 Dashboard
-Revenus par année
-Top genres
-Rentabilité
-Distributions
-⚛️ Frontend
-Recherche full-text
-Filtres dynamiques
-Pagination
-📊 Metrics
-Metric	Value
-Documents	~1200
-Champs	25+
-Cleaning steps	16
-Queries DSL	12+
-Visualisations	6–8
-📚 Docs
-docs/runbook.md
-docs/data_cleaning.md
-docs/data_dictionary.md
-docs/requetes_elasticsearch.md
-docs/SYNTHESE_PROJET.md
-🔄 Git Workflow
-main
-└── dev
-    └── feature/*
-PR obligatoires
-Code review
-Commits explicites
-🐛 Troubleshooting
-Issue	Fix
-ES ne démarre pas	vérifier RAM / logs
-Kibana KO	attendre init
-Pas de données	vérifier CSV
-CORS	config Docker
-🛠️ Stack
-Docker Compose
-Logstash
-Elasticsearch
-Kibana
-React + Vite
-Tailwind CSS
-📈 Roadmap
- Security (X-Pack)
- CI/CD
- Tests
- ML
- Export
-🏆 Team
+```
 
-Projet data engineering réalisé dans un contexte académique avec des standards proches de l’industrie.
+**Accès** : Kibana (http://localhost:5602) | ES (http://localhost:9201) | React (http://localhost:5173)
+
+---
+
+## 📂 Dossiers
+
+- `logstash/pipeline/` — Pipelines ETL (raw.conf, clean.conf)
+- `application_react/` — Frontend React
+- `docs/` — Documentation complète
+- `docker-compose.yml` — Configuration
+
+---
+
+## ✅ Livrables
+
+- ✅ 2 index Elasticsearch (`movies_raw`, `movies_clean`)
+- ✅ Mapping explicite + analyzer personnalisé
+- ✅ 12+ requêtes DSL commentées
+- ✅ Dashboard Kibana (6-8 visualisations)
+- ✅ Moteur de recherche (React)
+- ✅ Documentation complète
+
+---
+
+## 📚 Docs
+
+| Document | Contenu |
+|----------|---------|
+| [runbook.md](docs/runbook.md) | Guide complet démarrage & ops |
+| [data_cleaning.md](docs/data_cleaning.md) | Détail nettoyage (16 étapes) |
+| [requetes_elasticsearch.md](docs/requetes_elasticsearch.md) | Requêtes DSL |
+| [planning_poker.md](docs/planning_poker.md) | Estimation équipe |
+| [SYNTHESE_PROJET.md](docs/SYNTHESE_PROJET.md) | Synthèse finale |
+
+---
+
+## 🛠️ Tech
+
+Docker • Elasticsearch 8.10.2 • Kibana 8.10.2 • Logstash 8.10.2 • React 18 • Vite
+
+---
+
+## 🔧 Troubleshooting
+
+**ES ne démarre ?** → `docker-compose logs elasticsearch`  
+**CSV pas traité ?** → Vérifier `DATA/movies.csv`  
+**CORS bloqué ?** → Vérifier `http.cors.enabled=true`
+
+---
+
+## 📊 Stats
+
+| | |
+|---|---|
+| Champs | 19 → 25+ |
+| Étapes nettoyage | 16 |
+| Requêtes DSL | 12+ |
+| Films indexés | ~1200 |
+
