@@ -20,11 +20,9 @@ Ce document synthétise les estimations et l'organisation du projet Movies Data 
 
 | Rôle | Nom/Équipe | Responsabilités |
 | --- | --- | --- |
-| Lead Technique | ... | Intégration, merge, qualité |
-| Développeur 1 | ... | Backend ELK |
-| Développeur 2 | ... | Nettoyage/Mapping |
-| Développeur 3 | ... | Requêtes/Analytics |
-| Développeur 4 | ... | Frontend React + Doc |
+| Lead Technique | ... | Intégration, merge, qualité, requêtes |
+| Développeur 1 | ... | Backend ELK, nettoyage, mapping |
+| Développeur 2 | ... | Dashboard Kibana, moteur de recherche, doc |
 
 ---
 
@@ -57,7 +55,7 @@ Ce document synthétise les estimations et l'organisation du projet Movies Data 
 4. CORS activé pour communication inter-services
 5. Documentation de démarrage/arrêt
 
-**Estimation initiale** : 2, 2, 3, 2, 2  
+**Estimation initiale** : 2, 2, 3  
 **Décision finale** : **2 points** (30 min - 1h)  
 **Hypothèses** : Configuration Docker standard, pas de stockage persistant complexe
 
@@ -77,7 +75,7 @@ Ce document synthétise les estimations et l'organisation du projet Movies Data 
 4. Index contient tous les films du CSV
 5. Preuve d'ingestion : `_count` retourne le nombre de docs
 
-**Estimation initiale** : 3, 2, 3, 3, 2  
+**Estimation initiale** : 3, 2, 3  
 **Décision finale** : **3 points** (1-2h)  
 **Hypothèses** : Format CSV stable, pas de variantes de colonnes
 
@@ -100,7 +98,7 @@ Ce document synthétise les estimations et l'organisation du projet Movies Data 
 7. Index movies_clean rempli avec ~1100-1200 docs
 8. Vérification avant/après documentée
 
-**Estimation initiale** : 8, 5, 8, 5, 8  
+**Estimation initiale** : 8, 5, 8  
 **Décision finale** : **8 points** (4-8h)  
 **Hypothèses** : Logique de nettoyage bien définie, pas de régles métier complexes à découvrir, format CSV cohérent
 
@@ -123,7 +121,7 @@ Ce document synthétise les estimations et l'organisation du projet Movies Data 
 7. Asciifolding pour accents (Amélie → Amelie)
 8. Vérification : `_analyze` endpoint fonctionne
 
-**Estimation initiale** : 3, 3, 2, 3, 3  
+**Estimation initiale** : 3, 3, 2  
 **Décision finale** : **3 points** (1-2h)  
 **Hypothèses** : Mapping standard, pas d'analyzer complexe requis
 
@@ -144,7 +142,7 @@ Ce document synthétise les estimations et l'organisation du projet Movies Data 
 5. Requêtes testables dans Kibana DevTools
 6. Exemples de résultats fournis
 
-**Estimation initiale** : 5, 3, 5, 3, 5  
+**Estimation initiale** : 5, 3, 5  
 **Décision finale** : **5 points** (2-4h)  
 **Hypothèses** : Cas métier définis, pas de tuning performance requis
 
@@ -172,7 +170,7 @@ Ce document synthétise les estimations et l'organisation du projet Movies Data 
 - Films rentables vs non-rentables (gauge)
 - Top 20 acteurs (horizontal bar)
 
-**Estimation initiale** : 8, 5, 8, 5, 8  
+**Estimation initiale** : 8, 5, 8  
 **Décision finale** : **8 points** (4-8h)  
 **Hypothèses** : Données préparées, pas de ETL complexe, accès Kibana disponible
 
@@ -198,7 +196,7 @@ Ce document synthétise les estimations et l'organisation du projet Movies Data 
 - Frontend : React + Vite + Shadcn UI (Radix + Material-UI)
 - Backend : Requête directe ES (CORS activé)
 
-**Estimation initiale** : 5, 5, 8, 5, 5  
+**Estimation initiale** : 5, 5, 8  
 **Décision finale** : **5 points** (2-4h)  
 **Hypothèses** : UI standard, requête ES simple, pas de autosuggest complexe
 
@@ -228,7 +226,7 @@ Ce document synthétise les estimations et l'organisation du projet Movies Data 
    - Bilan, limites, améliorations
 7. Tous les fichiers correctement formatés (Markdown, grammaire, structure)
 
-**Estimation initiale** : 8, 5, 8, 5, 8  
+**Estimation initiale** : 8, 5, 8  
 **Décision finale** : **8 points** (4-8h)  
 **Hypothèses** : Travail déjà réalisé (pipelines, requêtes, dashboard), documentation à synthétiser
 
@@ -246,13 +244,11 @@ Ce document synthétise les estimations et l'organisation du projet Movies Data 
 
 | Sous-tâche | Points | Responsable |
 | --- | --- | --- |
-| Étapes 1-7 (CSV parsing, typage, drop) | 3 | Dev 2 |
-| Étapes 8-9 (Dates, genres normalisé) | 3 | Dev 2 |
-| Étapes 10-14 (Keywords, credits, calculs, rating) | 2 | Dev 3 |
-| Étapes 15-16 (Cleanup, fingerprinting) | 2 | Dev 1 |
-| Tests et validation | 2 | Dev 2 |
+| Étapes 1-7 (CSV parsing, typage, drop) | 3 | Dev 1 |
+| Étapes 8-12 (Dates, genres, keywords, credits, companies) | 3 | Dev 1 |
+| Étapes 13-16 (Champs calculés, rating, cleanup, fingerprint) | 2 | Lead |
 
-**Avantage** : Paralléliser certaines étapes, réduire les blocages
+**Avantage** : Découpage clair par blocs logiques
 **Risque** : Complexité accrue au merge (conflits potentiels dans clean.conf)
 **Action** : Planifier des syncs quotidiennes, branche dev à jour
 
@@ -279,39 +275,41 @@ Ce document synthétise les estimations et l'organisation du projet Movies Data 
 
 | Feature | Responsable | Points | Durée |
 | --- | --- | --- | --- |
-| F1 — Bootstrap | Dev 1 | 2 | 1h |
-| F2 — Ingestion raw | Dev 1 | 3 | 2h |
-| **Sous-total** | — | **5** | **3h** |
+| F1 — Bootstrap | Lead | 2 | 1h |
+| F2 — Ingestion raw | Lead | 3 | 2h |
+| F3 — Nettoyage | Dev 1 | 8 | 6h |
+| **Sous-total** | — | **13** | **9h** |
 
-### Sprint 2 (Semaine 1-2)
-
-| Feature | Responsable | Points | Durée |
-| --- | --- | --- | --- |
-| F3 — Nettoyage (split) | Dev 2 + Dev 3 | 8 | 6h |
-| F4 — Mapping | Dev 2 | 3 | 2h |
-| **Sous-total** | — | **11** | **8h** |
-
-### Sprint 3 (Semaine 2-3)
+### Sprint 2 (Semaine 2)
 
 | Feature | Responsable | Points | Durée |
 | --- | --- | --- | --- |
-| F5 — Requêtes | Dev 3 | 5 | 4h |
-| F6 — Dashboard | Dev 4 | 8 | 6h |
-| **Sous-total** | — | **13** | **10h** |
+| F4 — Mapping | Dev 1 | 3 | 2h |
+| F5 — Requêtes | Lead | 5 | 4h |
+| F6 — Dashboard | Dev 2 | 8 | 6h |
+| **Sous-total** | — | **16** | **12h** |
 
-### Sprint 4 (Semaine 3-4)
+### Sprint 3 (Semaine 3)
 
 | Feature | Responsable | Points | Durée |
 | --- | --- | --- | --- |
-| F7 — Moteur recherche | Dev 4 | 5 | 4h |
-| F8 — Documentation | Dev 1 + 2 + 3 + 4 | 8 | 6h |
+| F7 — Moteur recherche | Dev 2 | 5 | 4h |
+| F8 — Documentation | Lead + Dev 1 + Dev 2 | 8 | 6h |
 | Intégration + tests | Lead | — | 4h |
 | **Sous-total** | — | **13** | **14h** |
 
 ### Synthèse
 
 **Total estimé** : 42 points, ~35h de travail
-**Durée réelle** : 3-4 semaines (selon équipe et blocages)
+**Durée réelle** : 3 semaines (selon équipe et blocages)
+
+### Charge par membre
+
+| Membre | Features | Points totaux |
+| --- | --- | --- |
+| Lead | F1, F2, F5, F8 (partiel) | ~13 |
+| Dev 1 | F3, F4, F8 (partiel) | ~14 |
+| Dev 2 | F6, F7, F8 (partiel) | ~15 |
 
 ---
 
@@ -334,6 +332,7 @@ Ce document synthétise les estimations et l'organisation du projet Movies Data 
 | Performance Elasticsearch | Faible | Moyen | Indexation progressively, monitoring |
 | CORS bloqué entre React et ES | Faible | Moyen | Tests précoces de connectivity |
 | Requirements changent mid-project | Moyen | Élevé | Scope gelé, changements = new feature |
+| Charge mal répartie (équipe réduite) | Moyen | Moyen | Réajustement hebdomadaire des tâches |
 
 ### Actions de mitigation
 
@@ -351,7 +350,7 @@ Ce document synthétise les estimations et l'organisation du projet Movies Data 
 
 | Métrique | Estimation |
 | --- | --- |
-| Vélocité moyenne | 10-13 points / semaine |
+| Vélocité moyenne | 13-16 points / semaine |
 | Taille moyenne des PRs | 1-2 features par PR |
 | Temps review moyen | 30-60 min par PR |
 | Taux de succès de merge | 90%+ (faible taux de revert) |
