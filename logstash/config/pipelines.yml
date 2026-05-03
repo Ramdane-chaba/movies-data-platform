@@ -1,0 +1,5 @@
+- pipeline.id: raw
+  path.config: "/usr/share/logstash/pipeline/raw.conf"
+
+- pipeline.id: clean
+  path.config: "/usr/share/logstash/pipeline/clean.conf"
