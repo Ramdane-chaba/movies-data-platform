@@ -81,7 +81,7 @@ Docker • Elasticsearch 8.10.2 • Kibana 8.10.2 • Logstash 8.10.2 • React 
 
 ## 📊 Stats
 
-| | |
+| Indicateur | Valeur |
 |---|---|
 | Champs | 19 → 25+ |
 | Étapes nettoyage | 16 |
