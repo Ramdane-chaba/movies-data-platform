@@ -5,3 +5,5 @@ logs/
 __pycache__/
 .ipynb_checkpoints/
 application_react/node_modules/
+app-react/node_modules/
+app-react/node_modules/
