@@ -2,8 +2,7 @@
 
 Plateforme d'analyse de films avec **ELK Stack** (Elasticsearch, Kibana, Logstash)
 
-**Équipe** : Ramdane CHABA • Ouissem Aouimeur • Ghiles Mekdam
-
+**Équipe** : Ramdane CHABA 
 ---
 
 ## 📌 Vue d'ensemble
